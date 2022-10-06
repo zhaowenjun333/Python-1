@@ -1,0 +1,107 @@
+cmder
+1. 下载https://cmder.net/ 
+2. 解压到指定⽬录 
+3. 添加环境变量 
+4. 以管理员身份运⾏Cmder.exe ,输⼊Cmder.exe /REGISTER ALL，添加到右键菜单（可选）
+启动服务
+net start mongodb
+关闭服务
+net stop mongodb
+
+mongo 
+
+DBQuery.shellBatchSize=100   // 显示100条数据
+
+查看数据库
+show dbs
+
+使用数据库
+use demo
+查看当前数据库
+db
+
+创建集合
+db.createCollection(name, option)
+name:             创建集合名称
+option：是一个字典  文档    指定创建集合的配置
+    capped: Boolean类型  默认False 没有设置上线   True设置上限
+    size: 	表示设置上限大小   如果设置的大小<256  默认按照256
+    max: number  指定上限集合允许的最大文档数量	
+    
+例子：
+db.createCollection('Gean', {capped:true,size:4})
+最多四行         
+db.createCollection('chenfan',{capped:true,size:5000,max:4})
+
+# 检测当前集合有没有设置上限
+db.chenfan.isCapped() 
+
+
+
+插入数据
+单个数据
+db.Gean.insert({x:1})
+列表插入多条数据
+db.chenfan.insert([{name:'陈凡',age:22},{name:'林非',age:23},{name:'李容宇'}])
+循环插入
+for(i=3;i<10;i++)db.Gean.insert({x:1})
+save()插入
+db.chenfan.save({_id:2,name:'陈凡',age:23})
+
+
+查看表
+show tables
+
+查看表信息
+db.chenfan.find()
+db.chenfan.find({name:'林非'})  
+查询数据格式化
+db.chenfan.find({name:'林非'}).pretty()
+db.chenfan.insert({name:'amy',age:18,addr:'湖南',sex:'女'})
+db.chenfan.find({name:'amy'}).pretty()
+多条件查询 findOne
+db.chenfan.findOne({addr:'湖南',age:18})
+
+删除表
+db.mark.drop()
+db.Gean.drop()
+
+
+操作查询
+查询个数
+ db.chenfan.count()
+条件查询
+db.chenfan.find({addr:'湖南'}).count()
+db.chenfan.count({addr:'湖南'})
+
+限制条件 不区分正负号，都是两条
+db.chenfan.find().limit(2)  
+db.chenfan.find().limit(-2)
+
+跳过几条数据
+跳过前四条数据找陈凡
+db.Gean.find({name:'陈凡'}).skip(4)  //错误用法
+db.Gean.find().skip(4)
+
+大于$gt
+db.chenfan.find({age:{$gt:18}})
+小于$lt
+db.chenfan.find({age:{$lt:23}})
+
+范围查询 $in
+db.chenfan.find({age:{$in:[21,23]}})
+
+或$or
+db.chenfan.find({$or:[{age:21},{age:23}]}
+
+# 自定义查询
+db.chenfan.find({ 
+    $where:function() { 
+        return this.age>21;
+    } 
+})
+
+db.chenfan.find({ $where:function() { return this.age>21;} })
+
+映射：返回指定字段
+db.chenfan.find({},{age:1})
