@@ -1,0 +1,10 @@
+scrapy startproject my_scrapy
+
+cd my_scrapy\
+
+创建spider文件
+scrapy genspider spider baidu.com
+
+
+控制台启动scrapy，执行程序
+scrapy crawl spider
