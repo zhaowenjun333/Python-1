@@ -1,0 +1,10 @@
+import turtle
+turtle.right(-30)
+turtle.fd(200)
+turtle.right(60)
+turtle.fd(200)
+turtle.right(120)
+turtle.fd(200)
+turtle.right(60)
+turtle.fd(200)
+turtle.right(120)
