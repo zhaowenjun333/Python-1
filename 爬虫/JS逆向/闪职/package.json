@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "jsdom": "^20.0.1",
+    "node-jsencrypt": "^1.0.0"
+  }
+}
