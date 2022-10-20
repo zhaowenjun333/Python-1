@@ -20,11 +20,7 @@ import csv
 
 
 class DZProducer(threading.Thread):
-    headers = {
-        'User-Agent': 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-        'Host': 'www.dianping.com',
-        'Cookie': 'fspop=test; cy=1; cye=shanghai; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; _lxsdk_cuid=183e0d70e97c8-060a8f5fd8e7db-26021f51-144000-183e0d70e97c8; _lxsdk=183e0d70e97c8-060a8f5fd8e7db-26021f51-144000-183e0d70e97c8; _hc.v=5783cd9d-2c98-3e30-d79d-7f51816e0159.1665924534; Hm_lvt_602b80cf8079ae6591966cc70a3940e7=1665924534; s_ViewType=10; WEBDFPID=19xzxv6194785vyy1018z6vxv18807v3816v8772x439795853v6x4y3-1981289477164-1665929476449AWIAWSEfd79fef3d01d5e9aadc18ccd4d0c95071599; dplet=5905ae07ba9d09e02aebb3ac736abe06; dper=a3a8ff29e55beeb6b6f168c8f8febb3594805607c49b0b21ecb1d7cd584fd58669e0b1bcd9d690cda78cd3bda3a8bde3f91204186e974b061bb02b274a2910e753f3c6dfa378eb5a90e81364f2a67ccb051f56c6fade5dc3952cf35a2513a29b; ll=7fd06e815b796be3df069dec7836c3df; ua=dpuser_5095982428; ctu=80250699b312b597868ffcb6836b0e6e5af2d6183bdd2f95ade9428455a6173a; Hm_lpvt_602b80cf8079ae6591966cc70a3940e7=1665929497; _lxsdk_s=183e1222e94-f5a-b28-cbd%7C%7C52'
-    }
+
 
     def __init__(self, page_q, info_q):
         super().__init__()
@@ -37,12 +33,46 @@ class DZProducer(threading.Thread):
         while True:
             if self.page_q.empty():
                 break
-            url = self.page_q.get()
+            (url, page_num) = self.page_q.get()
             # print(url)
-            self.parse_page(url)
+            self.parse_page(url, page_num)
 
-    def parse_page(self, url):
-        resp = requests.get(url, headers=self.headers)
+    def get_head(self, ur):
+        user_agent_lst = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36'
+        ]
+        user_agent = random.choice(user_agent_lst)
+
+        # chrome_options = webdriver.ChromeOptions()
+        # # chrome_options.add_argument('--headless')
+        # # 等效在cmd中：chrome --remote-debugging-port=9222
+        # chrome_options.add_experimental_option("debuggerAddress", '127.0.0.1:9222')
+        # chrome_options.add_argument(f'User-Agent={user_agent}')
+        # driver = webdriver.Chrome(options=chrome_options)
+        # driver.get(ur)
+        # cookie_lst = driver.get_cookies()
+        # li = []
+        # for cookies in cookie_lst:
+        #     name = cookies['name']
+        #     value = cookies['value']
+        #     li.append(f'{name}={value}')
+        # cookie = '; '.join(li)
+        # time.sleep(1)
+        # driver.quit()
+        headers = {
+            'User-Agent': user_agent,
+            'Host': 'www.dianping.com',
+            'Cookie': 'fspop=test; cy=1; cye=shanghai; _lxsdk_cuid=183f6b7b77ac8-0576b2000857a6-26021f51-144000-183f6b7b77bc8; _lxsdk=183f6b7b77ac8-0576b2000857a6-26021f51-144000-183f6b7b77bc8; _hc.v=1d14c5e5-9369-774b-3393-4955af60834d.1666291579; Hm_lvt_602b80cf8079ae6591966cc70a3940e7=1666291579; s_ViewType=10; lgtoken=0ae2f3f34-0188-4b18-b288-76c6bf3c512b; WEBDFPID=u098vy4w172w5wvz0w16y2z649uv8u1v816u3y039w3979583vx686zz-1981651688000-1666291687315WGCSEGSfd79fef3d01d5e9aadc18ccd4d0c95071444; dplet=c8a5a40d68db99102961b0c323115f40; dper=d337bc7d6fb74b0bba231d0f6194495b5d6d2925707fef8bab8b95b7a79b84fee42437ffec6de7c0f8b4bb408f70f90a6d4ab1c719cd9a564866b26b9d0862be181b78cba2668e3f1589fee0bf0007c421a730307cb720ca7bf5bb12981f9f38; ll=7fd06e815b796be3df069dec7836c3df; ua=Gean; ctu=f038cc6e62074d02d2dccf4f1fee29143d98513ff2966d55a74c2481aac9d5da; Hm_lpvt_602b80cf8079ae6591966cc70a3940e7=1666291712; _lxsdk_s=183f6b7b77c-e4e-d02-b49%7C%7C74'
+        }
+        return headers
+
+    def parse_page(self, url, page_num):
+        headers = self.get_head(url)
+        # print(f'headers: {headers}')
+        resp = requests.get(url, headers=headers)
         resp.encoding = 'utf-8'
         html = resp.text
         # print(html)
@@ -51,16 +81,16 @@ class DZProducer(threading.Thread):
         shops = html_element.xpath('//div[@class="shop-list J_shop-list shop-all-list"]/ul/li')
         shops_type = re.findall('<div class="tag-addr">.*?<span class="tag">(.*?)</span>', html, re.S)
         # print(shops_type)
-        for info in range(len(shops)):
-            url = shops[info].xpath('.//div[@class="tit"]/a/@href')[0]
-            shop_type = shops_type[info].replace('<svgmtsi class="tagName">', '').replace('</svgmtsi>', '')
+        for num in range(len(shops)):
+            url = shops[num].xpath('.//div[@class="tit"]/a/@href')[0]
+            shop_type = shops_type[num].replace('<svgmtsi class="tagName">', '').replace('</svgmtsi>', '')
             for k, v in tagName_dict.items():
                 shop_type = shop_type.replace(k, v)
-            self.parse_second(url, shop_type)
+            self.parse_second(url, shop_type, num, page_num, headers)
 
-    def parse_second(self, url, shop_type):
+    def parse_second(self, url, shop_type, num, page_num, headers):
         item = {}
-        resp = requests.get(url, headers=self.headers)
+        resp = requests.get(url, headers=headers)
         resp.encoding = 'utf-8'
         html = resp.text
         # print(html)
@@ -113,9 +143,9 @@ class DZProducer(threading.Thread):
             for k, v in num_dict.items():
                 tel = tel.replace(k, v)
         item['电话号码'] = tel
-        self.info_q.put(item)
+        self.info_q.put((item, num, page_num))
         print(item)
-        print('-----' * 30)
+        # print('-----' * 30)
 
     # def grade_num(self, url):
     #     global grade
@@ -134,27 +164,24 @@ class DZProducer(threading.Thread):
 
 
 class DZConsumer(threading.Thread):
-    def __init__(self, info_q, heads, w):
+    def __init__(self, info_q, s, c):
         super().__init__()
         self.info_q = info_q
-        self.heads = heads
-        self.writer = w
+        self.sheet = s
+        self.col = c
 
-    def saveData(self, item):
-        rows = []
-        for head in self.heads:
-            rows.append(item[head])
-        rows = tuple(rows)
-        self.writer.writerow(rows)
-        print("Over！")
+    def saveData(self, item, num, page_num):
+        for column in range(len(self.col)):
+            row = (page_num-1)*15 + num + 1
+            data = self.col[column]
+            self.sheet.write(row, column, item[data])
 
     def run(self):
         while True:
             if self.info_q.empty():
                 break
-            info = self.info_q.get()
-            # print(info)
-            self.saveData(info)
+            info, num, page_num = self.info_q.get()
+            self.saveData(info, num, page_num)
             # print('----' * 40)
 
 
@@ -187,17 +214,13 @@ if __name__ == '__main__':
     with open('./get_dicts/tagName.txt', 'r', encoding='utf-8') as tagName_txt:
         tagName_dict = eval(tagName_txt.readline())
 
-    # f = open('./全国宠物店信息.csv', 'w+', encoding='utf-8-sig', newline='')
-    # writer = csv.writer(f)
-    # writer.writerow(header)
-
     # 1. url存放到队列中
     page_queue = Queue()
     # 2. 存放数据的队列
     info_queue = Queue()
-    for page in range(1, 2):
+    for page in range(1, 5):
         page_url = f'https://www.dianping.com/search/keyword/1/0_%E5%AE%A0%E7%89%A9%E5%BA%97/p{page}'
-        page_queue.put(page_url)
+        page_queue.put((page_url, page))
 
     p_lst = []
     # 创建五个生产者
@@ -218,15 +241,14 @@ if __name__ == '__main__':
 
     c_lst = []
     # 创建五个消费者
-    for j in range(15):
-        t2 = DZConsumer(info_queue, header, writer)
+    for j in range(5):
+        t2 = DZConsumer(info_queue, sheet, col)
         t2.start()
         c_lst.append(t2)
 
     for c in c_lst:
         c.join()
 
-    f.close()
     book.save('./全国宠物店信息.xls')
     print('关闭文件')
     ti2 = time.time()
