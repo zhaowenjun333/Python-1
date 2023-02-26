@@ -1,9 +1,3 @@
-# 1、网站名称：BOSS直聘；网址：https://www.zhaopin.com/；
-# 2、爬取数据示例：上海-徐汇区 数据分析助理
-# 上海思勃商务咨询有限公司  20-99人  民营  6千-8千 本科  数据分析 不限
-# 3、展示内容：
-# （1）city（2）position（3）company_name（4）company_size（5）company_type（6）salary
-
 import re
 import threading
 import time

@@ -67,6 +67,7 @@ class BossProducer(threading.Thread):
             }
             print(item)
             self.info_q.put(item)
+            print(self.info_q.qsize())
 
 
 class BossConsumer(threading.Thread):
@@ -74,29 +75,20 @@ class BossConsumer(threading.Thread):
         super().__init__()
         self.info_q = info_q
 
-    def saveData1(self, lst):
+    def saveData1(self, item):
         # book = xlwt.Workbook(encoding='utf-8', style_compression=0)
         # sheet = book.add_sheet('数据分析助理', cell_overwrite_ok=True)
-        col = ('job_name', 'position',
-               'diploma', 'company_name', 'company_size',
-               'company_type', 'salary')
-        with open('智联校招.csv', 'w', encoding='utf-8-sig', newline='') as f1:
-            csvwriter = csv.DictWriter(f1, col)  # 标题
-            csvwriter.writeheader()  # 写入标题
-            csvwriter.writerows(lst)  # 写入数据
-            f1.close()
-            print('保存完毕')
-        f1.close()
+        print(item)
 
     def run(self):
-        lst = []
         while True:
             if self.info_q.empty():
                 break
             info = self.info_q.get()
-            lst.append(info)
+            self.saveData1(info)
+            # lst.append(info)
         # print(lst)
-        self.saveData1(lst)
+        # self.saveData1(lst)
 
 
 if __name__ == '__main__':
@@ -107,22 +99,30 @@ if __name__ == '__main__':
     page_queue = Queue()
     # 2. 存放数据的队列
     info_queue = Queue()
-    with open('../BOSS直聘/全球免费代理.csv', 'r', encoding='utf-8') as f:
+    with open('./全球免费代理.csv', 'r', encoding='utf-8') as f:
         csvreader = csv.DictReader(f)
         proxies_list = []
         for i in csvreader:
             proxies_list.append(i)
         f.close()
     # print(proxies_list)
-    for i in range(1, 20):
+
+    col = ('job_name', 'position',
+           'diploma', 'company_name', 'company_size',
+           'company_type', 'salary')
+    with open('智联校招new.csv', 'w', encoding='utf-8-sig', newline='') as f1:
+        csvwriter = csv.DictWriter(f1, col)  # 标题
+        csvwriter.writeheader()  # 写入标题
+
+    for i in range(1, 35):
         page_url = f'https://xiaoyuan.zhaopin.com/api/sou?S_SOU_FULL_INDEX={parse.quote(kw)}&' \
                    f'S_SOU_POSITION_SOURCE_TYPE=&pageIndex={i}&' \
                    f'S_SOU_POSITION_TYPE=2&S_SOU_WORK_CITY={city_id}&' \
                    f'S_SOU_JD_INDUSTRY_LEVEL=&S_SOU_COMPANY_TYPE=&' \
-                   f'S_SOU_REFRESH_DATE=&order=12&pageSize=30&_v=0.58902018&' \
-                   f'at=c26f7a1209024a2a90937a11b366242b&rt=6a5483e0b17f46ae9fa197581ca2008a&' \
-                   f'x-zp-page-request-id=080c5556b891427d9ced90c304bf274f-1663815288330-522497&' \
-                   f'x-zp-client-id=c3db95ca-6291-4645-e4bc-027f04f01c91'
+                   f'S_SOU_REFRESH_DATE=&order=12&pageSize=30&_v=0.36212744&' \
+                   f'at=d065c80aa7c84d28a89f2a5a2bb70b37&rt=9a9999d4f70543928178d7c879968984&' \
+                   f'x-zp-page-request-id=5c537cd731424e02875891a1aa46d643-1665672564904-479503' \
+                   f'&x-zp-client-id=19c1f885-8e1e-459c-b827-8d17ffa99bb0'
         page_queue.put(page_url)
 
     p_lst = []
