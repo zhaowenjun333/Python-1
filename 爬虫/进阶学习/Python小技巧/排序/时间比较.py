@@ -5,7 +5,8 @@ import timeit
 '''快速排序'''
 def quick_sort(arr):
     # 递归结束条件：如果序列长度小于等于1，则直接返回序列本身
-    if len(arr) <= 1:
+    n = len(arr)
+    if n <= 1:
         return arr
     # 被选择的基准值，这里选取索引位的一个元素
     pivot = arr[0]
@@ -25,10 +26,40 @@ def quick_sort(arr):
     return quick_sort(left) + [pivot] + quick_sort(right)
 
 
+'''选择排序'''
+def find_smallest(arr):
+    smallest = arr[0]
+    smallest_id = 0
+    for i in range(1, len(arr)):
+        if arr[i] < smallest:
+            smallest = arr[i]
+            smallest_id = i
+    return smallest_id
+
+def selection_sort(arr):
+    print(f'排序前：{arr}')
+    new_arr = []
+    n = len(arr)
+    if n <= 1:
+        return arr
+    for i in range(n):
+        # print(f'第{i}轮遍历')
+        smallest_id = find_smallest(arr)
+        # print(f'此轮最小的数为：{arr[smallest_id]}')
+        new_arr.append(arr.pop(smallest_id))
+        # print(f'次轮结束后arrr: {arr}')
+        # print(f'此轮结束后new_arr: {new_arr}')
+        # print('\n')
+    print(f'选择排序结果：{new_arr}')
+    return new_arr
+
+
 '''冒泡排序函数'''
 def bubble_sort(arr):
     print(f'排序前：{arr}')
     n = len(arr)
+    if n <= 1:
+        return arr
     for i in range(n):
         # 每次遍历只处理未排序的部分
         for j in range(0, n - i - 1):
@@ -42,8 +73,11 @@ def bubble_sort(arr):
 '''插入排序'''
 def insertion_sort(arr):
     print(f'排序前：{arr}')
+    n = len(arr)
+    if n <= 1:
+        return arr
     # 遍历未排序部分的元素
-    for i in range(1, len(arr)):
+    for i in range(1, n):
         # 当前要插入的元素
         key = arr[i]
         # 已排序部分的最后一个元素的下标
@@ -64,6 +98,8 @@ def insertion_sort(arr):
 def shell_sort(arr):
     print(f'排序前：{arr}')
     n = len(arr)
+    if n <= 1:
+        return arr
     gap = n // 2  # 初始间隔设定为数组长度的一半
     while gap > 0:
         for i in range(gap, n):
@@ -90,6 +126,11 @@ if __name__ == '__main__':
     quick_sort_t = timeit.timeit(stmt=f"quick_sort({random_arr})", setup="from __main__ import quick_sort", number=1)
     print(f'快速排序结果：{quick_sort_arr}')
     print(f'快速排序时间：{quick_sort_t}')
+
+    print('---' * 30)
+
+    selection_sort_t = timeit.timeit(stmt=f"selection_sort({random_arr})", setup="from __main__ import selection_sort", number=1)
+    print(f'选择排序时间：{selection_sort_t}')
 
     print('---' * 30)
 
